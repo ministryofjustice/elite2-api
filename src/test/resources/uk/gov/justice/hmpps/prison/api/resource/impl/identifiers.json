@@ -1,0 +1,11 @@
+[
+  {
+    "type": "MERGED",
+    "value": "A3333AB",
+    "offenderNo": "A1234AA",
+    "bookingId": -1,
+    "issuedAuthorityText": "Some Issued Authority Text",
+    "issuedDate": "2017-08-28",
+    "caseloadType": "INST"
+  }
+]

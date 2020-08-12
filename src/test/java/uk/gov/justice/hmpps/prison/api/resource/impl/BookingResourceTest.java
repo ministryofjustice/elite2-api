@@ -497,4 +497,19 @@ public class BookingResourceTest extends ResourceTest {
 
         assertThatJsonFileAndStatus(response, 200, "offender_non_association_details_per_vic.json");
     }
+
+    @Test
+    public void getIdentifiers_WithGlobalSearch() {
+        final var token = authTokenHelper.getToken(AuthTokenHelper.AuthToken.GLOBAL_SEARCH);
+
+        final var httpEntity = createHttpEntity(token, null);
+
+        final var response = testRestTemplate.exchange(
+                "/api/bookings/-1/identifiers",
+                HttpMethod.GET,
+                httpEntity,
+                String.class);
+
+        assertThatJsonFileAndStatus(response, 200, "identifiers.json");
+    }
 }
