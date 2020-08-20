@@ -1,8 +1,6 @@
 package uk.gov.justice.hmpps.prison.repository.impl;
 
 import com.google.common.collect.ImmutableMap;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
@@ -16,14 +14,17 @@ import uk.gov.justice.hmpps.prison.repository.storedprocs.TrustProcs.ProcessGlTr
 import java.util.Map;
 
 @Repository
-@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class FinanceRepositoryImpl extends RepositoryBase implements FinanceRepository {
 
-    private @Value("${api.currency:GBP}")
-    String currency;
-
+    private final String currency;
     private final InsertIntoOffenderTrans insertIntoOffenderTrans;
     private final ProcessGlTransNew processGlTransNew;
+
+    public FinanceRepositoryImpl( @Value("${api.currency:GBP}") final String currency, final InsertIntoOffenderTrans insertIntoOffenderTrans, final ProcessGlTransNew processGlTransNew) {
+        this.currency = currency;
+        this.insertIntoOffenderTrans = insertIntoOffenderTrans;
+        this.processGlTransNew = processGlTransNew;
+    }
 
     private final Map<String, FieldMapper> accountMapping = new ImmutableMap.Builder<String, FieldMapper>()
             .put("cash_balance", new FieldMapper("cash"))//
