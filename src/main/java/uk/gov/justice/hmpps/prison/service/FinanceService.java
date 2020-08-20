@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.hmpps.prison.api.model.Account;
+import uk.gov.justice.hmpps.prison.api.model.TransferTransaction;
+import uk.gov.justice.hmpps.prison.api.model.v1.Transaction;
 import uk.gov.justice.hmpps.prison.repository.BookingRepository;
 import uk.gov.justice.hmpps.prison.repository.FinanceRepository;
 import uk.gov.justice.hmpps.prison.security.VerifyBookingAccess;
@@ -25,5 +27,13 @@ public class FinanceService {
         return bookingRepository.getBookingAgency(bookingId)
                 .map(agency -> financeRepository.getBalances(bookingId, agency))
                 .orElse(null);
+    }
+
+    @Transactional
+    public Transaction transferToSavings(final String prisonId, final String offenderNo, final TransferTransaction transferTransaction) {
+        financeRepository.insertIntoOffenderTrans("CR");
+        financeRepository.insertIntoOffenderTrans("DR");
+        final var id = financeRepository.processGlTransNew();
+        return Transaction.builder().id(id).build();
     }
 }
