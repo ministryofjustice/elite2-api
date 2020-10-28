@@ -13,8 +13,6 @@ import java.util.Optional;
 @Repository
 public class AccessRoleRepository extends RepositoryBase {
 
-    private static final String EXCLUDE_ADMIN_ROLES_QUERY_TEMPLATE = " AND OMS_ROLES.ROLE_FUNCTION != 'ADMIN'";
-
     private static final StandardBeanPropertyRowMapper<AccessRole> ACCESS_ROLE_ROW_MAPPER =
             new StandardBeanPropertyRowMapper<>(AccessRole.class);
 
@@ -24,16 +22,13 @@ public class AccessRoleRepository extends RepositoryBase {
         Objects.requireNonNull(accessRole.getRoleFunction(), "Access role function is a required parameter");
 
         jdbcTemplate.update(
-                getQuery("INSERT_ACCESS_ROLE"),
+                getQuery(AccessRoleRepositorySql.INSERT_ACCESS_ROLE.getSql()),
                 createParams("roleCode", accessRole.getRoleCode(), "roleName", accessRole.getRoleName(), "parentRoleCode", accessRole.getParentRoleCode(), "roleFunction", accessRole.getRoleFunction()));
     }
 
     public void updateAccessRole(final AccessRole accessRole) {
-
-        final var query = "UPDATE_ACCESS_ROLE";
-
         jdbcTemplate.update(
-                getQuery(query),
+                getQuery(AccessRoleRepositorySql.UPDATE_ACCESS_ROLE.getSql()),
                 createParams("roleCode", accessRole.getRoleCode(), "roleName", accessRole.getRoleName(), "roleFunction", accessRole.getRoleFunction()));
     }
 
@@ -42,7 +37,7 @@ public class AccessRoleRepository extends RepositoryBase {
         AccessRole accessRole;
         try {
             accessRole = jdbcTemplate.queryForObject(
-                    getQuery("GET_ACCESS_ROLE"),
+                    getQuery(AccessRoleRepositorySql.GET_ACCESS_ROLE.getSql()),
                     createParams("roleCode", accessRoleCode),
                     ACCESS_ROLE_ROW_MAPPER);
         } catch (final EmptyResultDataAccessException ex) {
@@ -53,9 +48,9 @@ public class AccessRoleRepository extends RepositoryBase {
 
     public List<AccessRole> getAccessRoles(final boolean includeAdmin) {
 
-        var query = getQuery("GET_ACCESS_ROLES");
+        var query = getQuery(AccessRoleRepositorySql.GET_ACCESS_ROLES.getSql());
         if (!includeAdmin) {
-            query += EXCLUDE_ADMIN_ROLES_QUERY_TEMPLATE;
+            query += AccessRoleRepositorySql.EXCLUDE_ADMIN_ROLES_QUERY_TEMPLATE.getSql();
         }
         final var builder = queryBuilderFactory.getQueryBuilder(query, ACCESS_ROLE_ROW_MAPPER);
         final var sql = builder.addOrderBy(Order.ASC, "roleName").build();
