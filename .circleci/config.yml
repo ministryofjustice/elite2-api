@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@1.1.0
+  hmpps: ministryofjustice/hmpps@dev:alpha4
   owasp: entur/owasp@0.0.10
 
 defaults: &defaults
@@ -88,78 +88,19 @@ workflows:
   version: 2
   build-test-and-deploy:
     jobs:
-      - check:
-          filters:
-            tags:
-              ignore: /.*/
-      - test-integration:
-          filters:
-            tags:
-              ignore: /.*/
-      - test-schema-nomis:
-          filters:
-            tags:
-              ignore: /.*/
       - hmpps/build_docker:
           name: build_docker
           filters:
             branches:
               only:
-                - main
+                - POC-generic-service-chart
       - hmpps/deploy_env:
           name: deploy_dev
-          env: "t3"
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - build_docker
-            - check
-            - test-integration
-            - test-schema-nomis
-      - request-stage-approval:
-          type: approval
-          requires:
-            - deploy_dev
-
-      - hmpps/deploy_env:
-          name: deploy_stage
           env: "t2"
           context: prison-api-t2
-          requires:
-            - request-stage-approval
-      - request-preprod-approval:
-          type: approval
-          requires:
-            - deploy_stage
-
-      - hmpps/deploy_env:
-          name: deploy_preprod
-          env: "preprod"
-          context: prison-api-preprod
-          requires:
-            - request-preprod-approval
-      - request-prod-approval:
-          type: approval
-          requires:
-            - deploy_preprod
-
-      - hmpps/deploy_env:
-          name: deploy_prod
-          env: "prod"
-          slack_notification: true
-          context: prison-api-prod
-          requires:
-            - request-prod-approval
-  scheduled:
-    triggers:
-      - schedule:
-          cron: "0 7 * * 1-5"
           filters:
             branches:
               only:
-                - main
-    jobs:
-      - owasp/gradle_owasp_dependency_check:
-          executor: builder
+                - POC-generic-service-chart
+          requires:
+            - build_docker

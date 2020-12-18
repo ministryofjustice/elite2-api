@@ -1,0 +1,5 @@
+# lockfiles for requirements.yaml for dependent charts
+requirements.lock
+
+# ignore dependent chart dirs
+charts

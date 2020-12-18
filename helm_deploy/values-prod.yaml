@@ -1,17 +1,11 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 3
-
-image:
-  repository: quay.io/hmpps/prison-api
-  tag: latest
-  pullPolicy: IfNotPresent
-  port: 8080
-
-env:
-  DATA_COMPLIANCE_DELETION_ENABLED: false
-  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: "https://sign-in.hmpps.service.justice.gov.uk/auth/.well-known/jwks.json"
-  SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 15
-  SPRING_REPLICA_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 20
-  SMOKE_TEST_AWARE: false
+generic-service:
+  replicaCount: 3
+  env:
+    DATA_COMPLIANCE_DELETION_ENABLED: false
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: "https://sign-in.hmpps.service.justice.gov.uk/auth/.well-known/jwks.json"
+    SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 15
+    SPRING_REPLICA_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 20
+    SMOKE_TEST_AWARE: false
