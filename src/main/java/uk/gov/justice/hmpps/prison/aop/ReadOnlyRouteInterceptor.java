@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import uk.gov.justice.hmpps.prison.web.config.RoutingDataSource;
 
 import java.util.Arrays;
+
+import static uk.gov.justice.hmpps.prison.util.MdcUtility.MASTER_DB;
 
 @Aspect
 @Component
@@ -37,12 +40,14 @@ public class ReadOnlyRouteInterceptor {
                     RoutingDataSource.setReplicaRoute();
                     log.trace("Routing database call to the replica");
                 } else {
+                    MDC.put(MASTER_DB, "true");
                     log.trace("Routing database call to the master");
                 }
             }
             return proceedingJoinPoint.proceed();
         } finally {
             RoutingDataSource.clearRoute();
+            MDC.remove(MASTER_DB);
         }
     }
 }

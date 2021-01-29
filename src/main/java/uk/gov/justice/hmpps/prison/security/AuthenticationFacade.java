@@ -16,7 +16,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.justice.hmpps.prison.util.MdcUtility.NOMIS_USER_HEADER;
+import static uk.gov.justice.hmpps.prison.util.MdcUtility.MASTER_DB;
+import static uk.gov.justice.hmpps.prison.util.MdcUtility.NOMIS_STAFF_USER;
 import static uk.gov.justice.hmpps.prison.util.MdcUtility.PROXY_USER;
 
 @Component
@@ -46,13 +47,14 @@ public class AuthenticationFacade {
     }
 
     public boolean isNomisStaffUser() {
-        return "true".equals(MDC.get(NOMIS_USER_HEADER));
+        return StringUtils.isNotBlank(MDC.get(NOMIS_STAFF_USER)) && StringUtils.isNotBlank(MDC.get(MASTER_DB));
     }
 
     public AuthSource getProxyUserAuthenticationSource() {
         final var auth = getAuthentication();
         return Optional.ofNullable(auth).
                 filter(a -> StringUtils.isNotBlank(MDC.get(PROXY_USER))).
+                filter(a -> StringUtils.isNotBlank(MDC.get(MASTER_DB))).
                 filter(AuthAwareAuthenticationToken.class::isInstance).
                 map(AuthAwareAuthenticationToken.class::cast).
                 filter(AbstractAuthenticationToken::isAuthenticated).

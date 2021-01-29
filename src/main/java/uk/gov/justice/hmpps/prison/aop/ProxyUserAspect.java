@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.hmpps.prison.security.AuthenticationFacade;
 import uk.gov.justice.hmpps.prison.service.UserService;
 
-import static uk.gov.justice.hmpps.prison.util.MdcUtility.NOMIS_USER_HEADER;
+import static uk.gov.justice.hmpps.prison.util.MdcUtility.NOMIS_STAFF_USER;
 import static uk.gov.justice.hmpps.prison.util.MdcUtility.PROXY_USER;
 
 @Aspect
@@ -37,20 +37,22 @@ public class ProxyUserAspect {
         var proxyUser = authenticationFacade.getCurrentUsername();
         try {
             if (proxyUser != null) {
-                final var isANomisUser = Boolean.toString(service.isStaff(proxyUser));
+                final var isANomisUser = service.isStaff(proxyUser);
                 log.debug("Proxying User: {} for {}->{} NOMIS User? = {}", proxyUser,
                         joinPoint.getSignature().getDeclaringTypeName(),
                         joinPoint.getSignature().getName(),
-                    isANomisUser);
+                        isANomisUser);
 
                 MDC.put(PROXY_USER, proxyUser);
-                MDC.put(NOMIS_USER_HEADER, isANomisUser);
+                if (isANomisUser) {
+                    MDC.put(NOMIS_STAFF_USER, "true");
+                }
             }
             return joinPoint.proceed();
         } finally {
             if (proxyUser != null) {
                 MDC.remove(PROXY_USER);
-                MDC.remove(NOMIS_USER_HEADER);
+                MDC.remove(NOMIS_STAFF_USER);
             }
         }
     }
